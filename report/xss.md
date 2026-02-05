@@ -33,3 +33,9 @@ msg 파라미터가 escape 없이 HTML에 그대로 삽입됨.
 대응 방안
 
 출력 시 escape 처리 또는 템플릿 엔진의 auto-escape 사용.
+
+## 패치 및 검증
+
+- `markupsafe.escape()`를 사용해 출력 인코딩(escaping) 적용
+- 동일 payload로 재시도 시 alert 미발생 확인
+- `<script>...</script>`가 실행되지 않고 문자열로 출력됨

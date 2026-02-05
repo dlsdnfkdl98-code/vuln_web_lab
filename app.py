@@ -1,4 +1,5 @@
 from flask import Flask, request
+from markupsafe import escape
 
 app = Flask(__name__)
 
@@ -29,6 +30,15 @@ def login():
         return f"<h1>Welcome {username}</h1>"
     else:
         return "<h1>Login Failed</h1>"
+
+
+@app.route("/echo")
+def echo():
+    msg = request.args.get("msg", "")
+    return f"<h1>{escape(msg)}</h1>"
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

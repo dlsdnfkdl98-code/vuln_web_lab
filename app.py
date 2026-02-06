@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, make_response
 from markupsafe import escape
 
 app = Flask(__name__)
@@ -8,6 +8,12 @@ USERS = {
     "admin": "1234",
     "user": "pass"
 }
+
+NOTES = {
+    "admin": "ADMIN SECRET: top-secret-note",
+    "user": "USER NOTE: hello"
+}
+
 
 @app.route("/")
 def home():
@@ -25,17 +31,32 @@ def login():
     username = request.form.get("username")
     password = request.form.get("password")
 
-    # ❌ 일부러 취약하게 만든 로직
     if username in USERS and USERS[username] == password:
-        return f"<h1>Welcome {username}</h1>"
+        resp = make_response(f"<h1>Welcome {escape(username)}</h1>")
+        resp.set_cookie("user", username)  # ❌ 일부러 취약: 서명/검증 없음
+        return resp
     else:
         return "<h1>Login Failed</h1>"
+
 
 
 @app.route("/echo")
 def echo():
     msg = request.args.get("msg", "")
     return f"<h1>{escape(msg)}</h1>"
+
+@app.route("/profile")
+def profile():
+    # 로그인한 사용자만 자신의 정보 접근 가능
+    user = request.cookies.get("user")
+
+    if not user:
+        return "<h2>Please login</h2>"
+
+    note = NOTES.get(user, "(no note)")
+    return f"<h2>Profile: {escape(user)}</h2><p>Note: {escape(note)}</p>"
+
+
 
 
 
